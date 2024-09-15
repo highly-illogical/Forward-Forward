@@ -3,6 +3,8 @@ import random
 from datetime import timedelta
 
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
 import torch
 import torchvision
 from hydra.utils import get_original_cwd
@@ -168,3 +170,17 @@ def log_results(result_dict, scalar_outputs, num_steps):
         else:
             result_dict[key] += value.item() / num_steps
     return result_dict
+
+def plot_weights(weights, p=None):
+    weights = weights[:100]
+    fig = plt.figure(figsize=(10, 10))
+    gs = gridspec.GridSpec(10, 10)
+    gs.update(wspace=0.01, hspace=0.1)
+    for i, w in enumerate(weights):
+        ax = plt.subplot(gs[i])
+        ax.axis("off")
+        ax.imshow(w.reshape(28, 28), cmap=plt.cm.gray, interpolation="nearest")
+
+    fig.suptitle(f"p = {p}", fontsize=16)
+    plt.savefig(f"weights{p}.png")
+    plt.show()

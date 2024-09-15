@@ -55,7 +55,7 @@ class FF_model(torch.nn.Module):
                 nn.init.zeros_(m.weight)
 
     def _layer_norm(self, z, eps=1e-8):
-        return z / (torch.sqrt(torch.mean(z ** 2, dim=-1, keepdim=True)) + eps)
+        return z / (torch.pow(torch.mean(torch.abs(z) ** self.opt.model.p, dim=-1, keepdim=True), 1 / self.opt.model.p) + eps)
 
     def _calc_peer_normalization_loss(self, idx, z):
         # Only calculate mean activity over positive samples.
@@ -71,9 +71,9 @@ class FF_model(torch.nn.Module):
         return torch.mean(peer_loss)
 
     def _calc_ff_loss(self, z, labels):
-        sum_of_squares = torch.sum(z ** 2, dim=-1)
+        goodness = torch.sum(torch.abs(z) ** self.opt.model.p, dim=-1)
 
-        logits = sum_of_squares - z.shape[1]
+        logits = goodness - z.shape[1]
         ff_loss = self.ff_loss(logits, labels.float())
 
         with torch.no_grad():
@@ -92,7 +92,7 @@ class FF_model(torch.nn.Module):
         # Concatenate positive and negative samples and create corresponding labels.
         z = torch.cat([inputs["pos_images"], inputs["neg_images"]], dim=0)
         posneg_labels = torch.zeros(z.shape[0], device=self.opt.device)
-        posneg_labels[: self.opt.input.batch_size] = 1
+        posneg_labels[:self.opt.input.batch_size] = 1
 
         z = z.reshape(z.shape[0], -1)
         z = self._layer_norm(z)

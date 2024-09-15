@@ -75,6 +75,8 @@ def my_main(opt: DictConfig) -> None:
     if opt.training.final_test:
         validate_or_test(opt, model, "test")
 
+    utils.plot_weights(model.model[0].weight.detach().cpu().numpy(), p=opt.model.p)
+
 
 if __name__ == "__main__":
     my_main()

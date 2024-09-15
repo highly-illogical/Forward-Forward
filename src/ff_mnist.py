@@ -39,7 +39,7 @@ class FF_MNIST(torch.utils.data.Dataset):
         # Create randomly sampled one-hot label.
         classes = list(range(self.num_classes))
         classes.remove(class_label)  # Remove true label from possible choices.
-        wrong_class_label = np.random.choice(classes)
+        wrong_class_label = np.random.choice(classes).astype(np.int64)
         one_hot_label = torch.nn.functional.one_hot(
             torch.tensor(wrong_class_label), num_classes=self.num_classes
         )
