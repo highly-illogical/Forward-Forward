@@ -76,6 +76,7 @@ def my_main(opt: DictConfig) -> None:
         validate_or_test(opt, model, "test")
 
     utils.plot_weights(model.model[0].weight.detach().cpu().numpy(), p=opt.model.p)
+    utils.cluster_features(model.model[0].weight.detach().cpu().numpy())
 
 
 if __name__ == "__main__":

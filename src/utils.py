@@ -5,6 +5,7 @@ from datetime import timedelta
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+from sklearn.manifold import TSNE
 import torch
 import torchvision
 from hydra.utils import get_original_cwd
@@ -183,4 +184,16 @@ def plot_weights(weights, p=None):
 
     fig.suptitle(f"p = {p}", fontsize=16)
     plt.savefig(f"weights{p}.png")
+    plt.show()
+
+def cluster_features(weights):
+    # Perform t-SNE on the weights
+    tsne = TSNE(n_components=2, perplexity=5, random_state=0)
+    weights_2d = tsne.fit_transform(weights)
+    
+    # Plot the t-SNE results
+    plt.scatter(weights_2d[:, 0], weights_2d[:, 1])
+    plt.title('t-SNE plot')
+    plt.xlabel('t-SNE dimension 1')
+    plt.ylabel('t-SNE dimension 2')
     plt.show()
